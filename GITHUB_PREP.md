@@ -1,47 +1,56 @@
-# GitHub 上传准备清单
+# GitHub 上传记录
 
-## 已适合上传的内容
+这个项目已经上传到 GitHub：
 
-- `train.py`：训练入口。
-- `evaluate.py`：模型评估入口。
-- `rl_utils.py`：环境创建、reward shaping、算法选择等工具函数。
-- `configs/`：PPO/SAC 和不同 MuJoCo 环境的配置。
-- `scripts/`：常用命令脚本。
-- `README.md`：项目说明和运行方式。
-- `LEARNING_NOTES.md`：算法、环境、reward shaping 和调参笔记。
-- `RESULTS.md`：已验证结果、算力说明、实验路线。
-- `PROJECT_REPORT.md`：项目学习过程、架构和结果总结。
-- `TRAINING_PLAN.md`：正式训练前的启动说明。
-- `.github/workflows/ci.yml`：GitHub 上的轻量语法检查。
+```text
+https://github.com/Felix-robot/mujoco-ppo-sac-demo
+```
 
-## 不应该上传的内容
+## 我上传了什么
 
-这些已被 `.gitignore` 排除：
+上传的是项目代码和文档：
+
+- `train.py`
+- `evaluate.py`
+- `rl_utils.py`
+- `configs/`
+- `scripts/`
+- `README.md`
+- `PROJECT_REPORT.md`
+- `RESULTS.md`
+- `LEARNING_NOTES.md`
+- `TRAINING_PLAN.md`
+- `.github/workflows/ci.yml`
+
+## 我没有上传什么
+
+这些内容只保留在本地：
 
 - `.venv/`
 - `runs/`
 - `.tmp/`
 - `__pycache__/`
-- `*.zip`
-- `*.pkl`
-- `*.pt`
-- `*.pth`
+- 模型文件
+- TensorBoard 原始日志
 
-## 上传前还需要你决定
+原因是这些文件要么太大，要么和本机环境绑定，不适合作为 GitHub 仓库内容。
 
-1. 仓库名，例如 `mujoco-ppo-sac-demo` 或 `rl-mujoco-starter`。
-2. 是否公开仓库。
-3. 是否添加开源协议。作品集示例项目通常可以选 MIT License。
-4. 是否上传训练曲线截图。建议跑完正式实验后再加。
+## 初始提交
 
-## 推荐第一次提交信息
+第一次上传时的提交：
 
 ```text
-Initial MuJoCo PPO/SAC training demo
+bc72c3f Initial MuJoCo PPO/SAC training demo
 ```
 
-## 推荐仓库描述
+后续如果修改文档或代码，我会继续用普通 git commit 更新。
 
-```text
-A reproducible Stable-Baselines3 PPO/SAC training demo on Gymnasium MuJoCo environments.
-```
+## 后续可以补充
+
+我后续可能会补：
+
+- TensorBoard 曲线截图。
+- 更长训练的结果。
+- SAC 对比结果。
+- reward shaping 对比结果。
+- MIT License。

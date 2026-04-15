@@ -1,41 +1,72 @@
-# RL 任务学习笔记
+# 学习笔记
 
-## PPO 和 SAC 的区别
+这里记录我做这个项目时整理出来的基础概念。
 
-PPO 是 on-policy 算法。它每次用当前策略采样一批数据，然后限制策略更新幅度，稳定但样本效率一般。适合先跑通实验，也比较容易 debug。
+## PPO 和 SAC
 
-SAC 是 off-policy 算法。它把历史经验放进 replay buffer 反复利用，同时最大化 reward 和 entropy。它通常样本效率更高，但对 replay buffer、warmup 步数、entropy 系数更敏感。
+PPO 是 on-policy 算法。它用当前策略采样数据，再用这些数据更新当前策略。PPO 的核心是限制策略每次更新的幅度，让训练更稳定。
 
-## MuJoCo 环境怎么选
+我对 PPO 的理解：
 
-`HalfCheetah-v5`：二维奔跑，状态和动作维度相对小，最适合第一次跑通。
+- 稳定性比较好。
+- 适合作为 baseline。
+- 样本效率一般，需要比较多环境交互。
 
-`Ant-v5`：四足机器人，动作维度更高，训练更慢，但展示效果更好。
+SAC 是 off-policy 算法。它会把经验存进 replay buffer，后面可以重复使用这些数据。SAC 还会通过 entropy 鼓励探索。
 
-`Humanoid-v5`：人形机器人，最难也最耗算力，不适合作为第一次验证环境。
+我对 SAC 的理解：
+
+- 样本效率通常更高。
+- 对 replay buffer、learning starts、entropy 系数更敏感。
+- 适合拿来和 PPO 做对比。
+
+## MuJoCo 环境
+
+我这次先选 `HalfCheetah-v5`，主要原因是它比 Ant 和 Humanoid 轻，适合先跑通。
+
+三个环境的大致区别：
+
+- `HalfCheetah-v5`：二维奔跑，动作维度较低，适合入门。
+- `Ant-v5`：四足机器人，动作更复杂，训练更慢。
+- `Humanoid-v5`：人形机器人，最难，也最吃算力。
+
+我后续会先把 HalfCheetah 结果做稳定，再考虑 Ant。
 
 ## Reward shaping
 
-Reward shaping 是在原始奖励基础上加入额外信号，让智能体更快学到你想要的行为。例如在 locomotion 任务里，可以提高向前速度奖励、加重能量消耗惩罚，或给摔倒行为更强惩罚。
+Reward shaping 是在原始 reward 上加额外信号，让 agent 更容易学到我想要的行为。
 
-要小心：reward shaping 可能让 agent 学会“钻空子”。比如只追求速度可能导致动作很抖，控制惩罚太重又可能导致 agent 不敢动。所以建议每次只改一两个 shaping 项，并保存对比曲线。
+比如 HalfCheetah 里可以更强调向前移动，也可以增加控制代价的惩罚。
+
+这里要注意一个问题：reward shaping 可能会改变任务本身。如果设计不好，agent 可能学到奇怪的策略。所以我认为 shaping 实验必须和原始 reward baseline 对比，不能只看 shaped reward 的结果。
 
 ## Hyperparameter tuning
 
-调参不是随便改参数，而是控制变量地比较实验：
+我目前认为调参应该按控制变量来做：
 
-1. 先固定环境、算法、总步数，只换 seed，判断结果波动。
-2. 再换算法，比如 PPO 对比 SAC。
-3. 再改 learning rate，例如 `3e-4`、`1e-4`、`1e-3`。
-4. PPO 可以调 `n_steps` 和 `batch_size`；SAC 可以调 `learning_starts` 和 `ent_coef`。
-5. 每次实验记录 mean reward 曲线，不只看最后一次结果。
+1. 固定环境和算法，先跑 baseline。
+2. 固定总步数，换不同 seed。
+3. 对比 PPO 和 SAC。
+4. 再改 learning rate、batch size、n_steps。
+5. 每次记录 TensorBoard 曲线和最终评估结果。
 
-## 报告可以写什么
+优先关注的参数：
 
-最简单的报告结构：
+- `learning_rate`
+- `n_steps`
+- `batch_size`
+- `n_epochs`
+- `gamma`
+- `ent_coef`
 
-1. 实验环境：HalfCheetah-v5，连续动作控制任务。
-2. 算法：PPO 或 SAC，以及为什么选它。
-3. 训练设置：总步数、seed、主要超参数。
-4. 结果：TensorBoard reward 曲线、最终评估 reward。
-5. 分析：reward shaping 前后有什么变化，哪些超参数最敏感。
+## 这次项目给我的主要收获
+
+我以前容易只关注算法公式。这次做完以后，我更明显感觉到 RL 项目里工程流程很重要：
+
+- 配置要可复现。
+- 训练日志要保存。
+- 模型要能重新加载。
+- 评估要和训练环境一致。
+- 结果要解释局限，不能只报一个分数。
+
+这也是我后面继续改进这个项目的方向。
